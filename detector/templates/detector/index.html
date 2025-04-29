@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Finger Detection</title>
+</head>
+<body>
+    {% csrf_token %}
+    <video id="webcam" width="640" height="480" autoplay muted playsinline></video>
+    <canvas id="output" width="640" height="480"></canvas>
+
+    <script>
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('output');
+        const ctx = canvas.getContext('2d');
+
+        // Access webcam stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => video.srcObject = stream);
+
+        function getCSRFToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+
+        // Process frames continuously
+        function processFrame() {
+            ctx.drawImage(video, 0, 0, 640, 480);
+            
+            fetch('/detect_fingers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    image: canvas.toDataURL('image/jpeg')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const img = new Image();
+                img.onload = () => ctx.drawImage(img, 0, 0);
+                img.src = 'data:image/jpeg;base64,' + data.processed_image;
+                requestAnimationFrame(processFrame);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                requestAnimationFrame(processFrame);
+            });
+        }
+        
+        video.addEventListener('loadeddata', () => {
+            processFrame();
+        });
+    </script>
+</body>
+</html>
