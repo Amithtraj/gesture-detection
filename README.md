@@ -42,6 +42,9 @@ Currently supported gestures:
 
 - ✅ Thumbs Up
 - ✅ Victory Sign (Index + Middle fingers)
+- ✅ Open Palm
+- ✅ Fist
+- ✅ Pointing
 
 ## Usage
 
