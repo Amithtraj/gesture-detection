@@ -27,6 +27,34 @@ def get_gesture(landmarks):
     ring_tip = landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP]
     pinky_tip = landmarks.landmark[mp_hands.HandLandmark.PINKY_TIP]
     
+    # Get additional landmarks for new gestures
+    index_dip = landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_DIP]
+    middle_dip = landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_DIP]
+    ring_dip = landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_DIP]
+    pinky_dip = landmarks.landmark[mp_hands.HandLandmark.PINKY_DIP]
+
+    # Open palm detection (all fingers extended)
+    if (index_tip.y < index_dip.y and
+        middle_tip.y < middle_dip.y and
+        ring_tip.y < ring_dip.y and
+        pinky_tip.y < pinky_dip.y):
+        return 'Open Palm'
+
+    # Fist detection (all fingers closed)
+    if (index_tip.y > index_dip.y and
+        middle_tip.y > middle_dip.y and
+        ring_tip.y > ring_dip.y and
+        pinky_tip.y > pinky_dip.y and
+        thumb_tip.y > thumb_ip.y):
+        return 'Fist'
+
+    # Pointing gesture (index extended, others closed)
+    if (index_tip.y < index_dip.y and
+        middle_tip.y > middle_dip.y and
+        ring_tip.y > ring_dip.y and
+        pinky_tip.y > pinky_dip.y):
+        return 'Pointing'
+    
     if thumb_tip.y < thumb_ip.y and \
        index_tip.y < middle_tip.y and \
        ring_tip.y > middle_tip.y and \

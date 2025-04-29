@@ -39,7 +39,16 @@
             .then(response => response.json())
             .then(data => {
                 const img = new Image();
-                img.onload = () => ctx.drawImage(img, 0, 0);
+                img.onload = () => {
+    ctx.drawImage(img, 0, 0);
+    ctx.fillStyle = 'green';
+    ctx.font = '20px Arial';
+    let yPos = 30;
+    data.gestures.forEach(gesture => {
+        ctx.fillText(gesture, 10, yPos);
+        yPos += 25;
+    });
+};
                 img.src = 'data:image/jpeg;base64,' + data.processed_image;
                 requestAnimationFrame(processFrame);
             })
