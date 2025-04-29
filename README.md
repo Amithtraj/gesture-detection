@@ -49,7 +49,17 @@ Currently supported gestures:
 2. Allow camera access
 3. Perform gestures in front of webcam
 
-## API Documentation
+## Detection Logic
+
+The system recognizes gestures based on finger landmark positions:
+
+- 👍 Thumbs Up: Thumb extended upward, other fingers closed
+- ✌️ Victory: Index and middle fingers raised, others closed
+- 🖐 Open Palm: All fingers fully extended
+- ✊ Fist: All fingers closed tightly
+- 👆 Pointing: Index finger extended, others closed
+
+## API Usage
 
 **Endpoint:** `/detect/`
 
