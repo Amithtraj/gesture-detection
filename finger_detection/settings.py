@@ -124,3 +124,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Add to end of settings.py
+MOUSE_SENSITIVITY = 2.0  # Adjust this value (1.0-3.0 recommended)

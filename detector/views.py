@@ -9,6 +9,7 @@ import base64
 
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+import pyautogui
 
 def index(request):
     return render(request, 'detector/index.html')
@@ -103,16 +104,25 @@ def detect_fingers(request):
 
         results = hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
 
+        import pyautogui
+
+        SCREEN_W, SCREEN_H = pyautogui.size()
+
+        # Add to detect_fingers function after gesture detection:
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
-                mp.solutions.drawing_utils.draw_landmarks(
-                    frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
-                # Detect and display gesture
-                gesture = get_gesture(hand_landmarks)
-                if gesture:
-                    cv2.putText(frame, gesture, (50, 50), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
+                
+                # Convert normalized coordinates to screen dimensions
+                x = int(index_tip.x * SCREEN_W)
+                y = int(index_tip.y * SCREEN_H)
+                
+                # Move mouse pointer
+                pyautogui.moveTo(x, y, duration=0.1)
+                
+                # Add click detection for fist gesture
+                if gesture == 'Fist':
+                    pyautogui.click()
 
         _, buffer = cv2.imencode('.jpg', frame)
         processed_image = base64.b64encode(buffer).decode('utf-8')
