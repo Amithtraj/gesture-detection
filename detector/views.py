@@ -111,6 +111,7 @@ def detect_fingers(request):
         mouse_control = data.get('mouse_control', False)
 
         gestures = []
+        prev_x, prev_y = getattr(detect_fingers, 'prev_x', None), getattr(detect_fingers, 'prev_y', None)
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
                 gesture = get_gesture(hand_landmarks)
@@ -120,9 +121,23 @@ def detect_fingers(request):
                     index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
                     x = int(index_tip.x * SCREEN_W)
                     y = int(index_tip.y * SCREEN_H)
-                    pyautogui.moveTo(x, y, duration=0.1)
-                    if gesture == 'Fist':
+                    if gesture == 'Pointing':
+                        if prev_x is not None and prev_y is not None:
+                            dx = x - prev_x
+                            dy = y - prev_y
+                            pyautogui.moveRel(dx, dy, duration=0.05)
+                        detect_fingers.prev_x = x
+                        detect_fingers.prev_y = y
+                    elif gesture == 'Fist':
                         pyautogui.click()
+                        detect_fingers.prev_x = None
+                        detect_fingers.prev_y = None
+                    else:
+                        detect_fingers.prev_x = None
+                        detect_fingers.prev_y = None
+        else:
+            detect_fingers.prev_x = None
+            detect_fingers.prev_y = None
 
         _, buffer = cv2.imencode('.jpg', frame)
         processed_image = base64.b64encode(buffer).decode('utf-8')
