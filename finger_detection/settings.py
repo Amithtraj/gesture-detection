@@ -127,4 +127,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Add to end of settings.py
-MOUSE_SENSITIVITY = 2.0  # Adjust this value (1.0-3.0 recommended)
+MOUSE_SENSITIVITY = 3.0  # Adjust this value (1.0-3.0 recommended)
