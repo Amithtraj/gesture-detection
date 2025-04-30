@@ -108,36 +108,27 @@ def detect_fingers(request):
 
         SCREEN_W, SCREEN_H = pyautogui.size()
 
-        # Add to detect_fingers function after gesture detection:
-        if results.multi_hand_landmarks:
-            for hand_landmarks in results.multi_hand_landmarks:
-                index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
-                
-                # Convert normalized coordinates to screen dimensions
-                x = int(index_tip.x * SCREEN_W)
-                y = int(index_tip.y * SCREEN_H)
-                
-                # Move mouse pointer
-                pyautogui.moveTo(x, y, duration=0.1)
-                
-                # Add click detection for fist gesture
-                if gesture == 'Fist':
-                    pyautogui.click()
+        mouse_control = data.get('mouse_control', False)
 
-        _, buffer = cv2.imencode('.jpg', frame)
-        processed_image = base64.b64encode(buffer).decode('utf-8')
-        
-        # Collect all detected gestures
         gestures = []
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
                 gesture = get_gesture(hand_landmarks)
                 if gesture:
                     gestures.append(gesture)
-        
+                if mouse_control:
+                    index_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
+                    x = int(index_tip.x * SCREEN_W)
+                    y = int(index_tip.y * SCREEN_H)
+                    pyautogui.moveTo(x, y, duration=0.1)
+                    if gesture == 'Fist':
+                        pyautogui.click()
+
+        _, buffer = cv2.imencode('.jpg', frame)
+        processed_image = base64.b64encode(buffer).decode('utf-8')
         return HttpResponse(json.dumps({
             'processed_image': processed_image,
-            'gestures': list(set(gestures))  # Remove duplicates
+            'gestures': list(set(gestures))
         }), content_type='application/json')
     return StreamingHttpResponse(gen(), content_type='multipart/x-mixed-replace; boundary=frame')
     return HttpResponse(status=405)

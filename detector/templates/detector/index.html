@@ -7,6 +7,8 @@
     {% csrf_token %}
     <video id="webcam" width="640" height="480" autoplay muted playsinline></video>
     <canvas id="output" width="640" height="480"></canvas>
+    <br>
+    <button id="toggleBtn">Enable Mouse Control & Detection</button>
 
     <script>
         const video = document.getElementById('webcam');
@@ -24,7 +26,6 @@
         // Process frames continuously
         function processFrame() {
             ctx.drawImage(video, 0, 0, 640, 480);
-            
             fetch('/detect_fingers', {
                 method: 'POST',
                 headers: {
@@ -33,7 +34,8 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({
-                    image: canvas.toDataURL('image/jpeg')
+                    image: canvas.toDataURL('image/jpeg'),
+                    mouse_control: mouseControlEnabled
                 })
             })
             .then(response => response.json())
@@ -44,10 +46,15 @@
     ctx.fillStyle = 'green';
     ctx.font = '20px Arial';
     let yPos = 30;
-    data.gestures.forEach(gesture => {
-        ctx.fillText(gesture, 10, yPos);
-        yPos += 25;
-    });
+    if (data.gestures && data.gestures.length > 0) {
+        data.gestures.forEach(gesture => {
+            ctx.fillText(gesture, 10, yPos);
+            yPos += 25;
+        });
+    } else {
+        ctx.fillText('No gesture detected', 10, yPos);
+    }
+    // Mouse control logic is handled by backend
 };
                 img.src = 'data:image/jpeg;base64,' + data.processed_image;
                 requestAnimationFrame(processFrame);
@@ -60,6 +67,12 @@
         
         video.addEventListener('loadeddata', () => {
             processFrame();
+        });
+        let mouseControlEnabled = false;
+        const toggleBtn = document.getElementById('toggleBtn');
+        toggleBtn.addEventListener('click', () => {
+            mouseControlEnabled = !mouseControlEnabled;
+            toggleBtn.textContent = mouseControlEnabled ? 'Disable Mouse Control & Detection' : 'Enable Mouse Control & Detection';
         });
     </script>
 </body>
