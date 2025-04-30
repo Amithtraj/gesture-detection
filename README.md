@@ -6,6 +6,9 @@
 - Supports multiple gestures (Thumbs Up, Victory sign)
 - REST API endpoint for image processing
 - Interactive web interface
++ Interactive web interface
++ Toggle button to enable/disable mouse control
++ Trackpad mode: move cursor with pointing gesture, click with fist gesture
 
 ## Requirements
 
@@ -50,7 +53,11 @@ Currently supported gestures:
 
 1. Access web interface at `http://localhost:8000`
 2. Allow camera access
-3. Perform gestures in front of webcam
+3. Use the toggle button to enable or disable mouse control
+4. Perform gestures in front of webcam:
+   - **Pointing**: Move the cursor like a trackpad (relative movement)
+   - **Fist**: Perform a mouse click
+   - Other gestures (Thumbs Up, Victory, Open Palm) are detected and displayed but do not control the mouse
 
 ## Detection Logic
 
@@ -93,3 +100,9 @@ Access `http://localhost:8000/detect` directly for MJPEG stream
 - Custom gesture detection algorithm
 - 30 FPS processing @ 640x480 resolution
 - Multi-hand detection support
+
+## Mouse Control (Trackpad Mode)
+
+- When mouse control is enabled, use the **Pointing** gesture to move the cursor relative to your finger's movement (trackpad style).
+- Use the **Fist** gesture to perform a mouse click.
+- Mouse control is only active when the toggle is enabled.
